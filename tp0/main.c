@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
+#include <math.h>
+
+#define MAX_VAL 255
 
 void usage(char* nombre);
 void version(char* nombre);
@@ -20,9 +23,23 @@ int parseResolution(char* res,int* resArray);
  * @return int 0 si se pudo parsear la resolucion, -1 en otro caso
  */
 
-
 int parseCenter(char* center, double* centerArray);
 
+/** Dadas las partes real e imaginara de un numero complejo devuelve 1 si el modulo es mayor que 2, 0 en caso contrario
+ * @param double parte real de un numero complejo
+ * @param double parte imaginaria de un numero complejo
+ * return int 1 si es el modulo es mayor que 2, 0 si es menor o igual
+ */
+
+int stop(double re, double im);
+
+
+/** Dado un numero complejo asociado a un pixel de la pantalla devuelve la intensidad asociada a ese pixel segun el algoritmo para mostrar conjuntos de Mandelbrot
+ * @param double parte real del complejo asociado a un pixel
+ * @param double parte imaginaria del complejo asociado a un pixel
+ * return char intensidad de ese pixel
+ */
+unsigned char getIntensity(double re, double im);
 
 int main(int argc, char* argv[]){
 	int opt;
@@ -72,6 +89,30 @@ int main(int argc, char* argv[]){
 				break;
 		}
 	}
+	//print(res,center,width,height);
+	printf( "%d \n ", getIntensity(center[0],center[1]));
+}
+
+int print(int* res, double* center, double width , double height){
+	
+}
+
+unsigned char getIntensity(double re, double im){
+	unsigned char i;
+	unsigned char intensity = MAX_VAL;
+	double auxRe =re ;
+	double auxIm =im ;
+	for( i = 0 ; i < MAX_VAL ; i++ ){
+		//printf( "stop: %d , [%f,%f]\n" ,stop(auxRe,auxIm),auxRe,auxIm);
+		if ( stop(auxRe,auxIm) ){
+			intensity = i;
+			break;
+		}
+		auxRe = auxRe * auxRe + auxRe - auxIm * auxIm ;
+		auxIm = 2*auxRe*auxIm + auxIm;
+		printf( "\t\t\t [%f,%f]\n" ,auxRe,auxIm);
+	}
+	return intensity;
 }
 
 int parseResolution(char* str, int* res){
@@ -116,12 +157,15 @@ int parseCenter(char* str, double* center){
 	center[1] = signI *atof(aux);
 }
 
-int parse(char* str, int* result){
-	
-}
 
 void version(char* name){
 	printf("%s version: 1.0.0: \n",name);
+}
+
+int stop(double re, double im){
+	if (sqrt((re*re)+(im*im))>2)
+		return 1;
+	return 0;
 }
 
 void usage(char* name){
@@ -137,3 +181,4 @@ void usage(char* name){
 	printf("\t %s -o uno.pgm \n",name);
 	printf("\t %s -c +0.282-0.01i -w 0.005 -H 0.005 -o dos.pgm \n",name);
 }
+
