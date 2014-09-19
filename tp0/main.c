@@ -89,12 +89,30 @@ int main(int argc, char* argv[]){
 				break;
 		}
 	}
-	//print(res,center,width,height);
-	printf( "%d \n ", getIntensity(center[0],center[1]));
+	print(res,center,width,height);
+		//printf( "%d \n ", getIntensity(center[0],center[1]));
 }
 
 int print(int* res, double* center, double width , double height){
-	
+	FILE* prueba;
+	prueba = fopen("prueba.pgm","wb");
+	printf("width : %f \t height: %f \n",width,height);
+	printf("width : %f \t height: %f \n",width,height);
+	double stepX = width / res[0];
+	double stepY = height/ res[1];
+	printf("stepX: %f \t stepY: %f \n",stepX,stepY);
+	double i ;
+	double j ; 
+	fprintf(prueba, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
+
+	for ( i = center[0]-width/2 ; i < center[0]+width/2 ; i+=stepX ) {
+		for ( j = center[1]-height/2 ; j < center[1]+height/2 ; j+=stepY) {
+			fprintf(prueba," numero: %f+%fi %d ",i,j,getIntensity(i,j));
+			fputc(' ',prueba);
+		}
+		fputc('\n',prueba);
+	} 
+	fclose(prueba);
 }
 
 unsigned char getIntensity(double re, double im){
@@ -110,7 +128,7 @@ unsigned char getIntensity(double re, double im){
 		}
 		auxRe = auxRe * auxRe + auxRe - auxIm * auxIm ;
 		auxIm = 2*auxRe*auxIm + auxIm;
-		printf( "\t\t\t [%f,%f]\n" ,auxRe,auxIm);
+		//printf( "\t\t\t [%f,%f]\n" ,auxRe,auxIm);
 	}
 	return intensity;
 }
