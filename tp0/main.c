@@ -107,7 +107,8 @@ int print(int* res, double* center, double width , double height){
 
 	for ( i = center[0]-width/2 ; i < center[0]+width/2 ; i+=stepX ) {
 		for ( j = center[1]-height/2 ; j < center[1]+height/2 ; j+=stepY) {
-			fprintf(prueba," numero: %f+%fi %d ",i,j,getIntensity(i,j));
+			//fprintf(prueba," numero: %f+%fi %d ",i,j,getIntensity(i,j));
+			fprintf(prueba,"%d",getIntensity(i,j));
 			fputc(' ',prueba);
 		}
 		fputc('\n',prueba);
@@ -126,8 +127,8 @@ unsigned char getIntensity(double re, double im){
 			intensity = i;
 			break;
 		}
-		auxRe = auxRe * auxRe + auxRe - auxIm * auxIm ;
-		auxIm = 2*auxRe*auxIm + auxIm;
+		auxRe = (auxRe * auxRe) - (auxIm * auxIm) + re;
+		auxIm = (2*auxRe*auxIm) + im;
 		//printf( "\t\t\t [%f,%f]\n" ,auxRe,auxIm);
 	}
 	return intensity;
