@@ -97,18 +97,34 @@ int print(int* res, double* center, double width , double height){
 	FILE* prueba;
 	prueba = fopen("prueba.pgm","wb");
 	printf("width : %f \t height: %f \n",width,height);
-	printf("width : %f \t height: %f \n",width,height);
 	double stepX = width / res[0];
 	double stepY = height/ res[1];
 	printf("stepX: %f \t stepY: %f \n",stepX,stepY);
-	double i ;
-	double j ; 
+	int i, j, k;
+	double x, y;
 	fprintf(prueba, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
+	double zx, zy;
+	double xtemp;
+	double zx2, zy2;
+	unsigned char intensity = MAX_VAL;
 
-	for ( i = center[0]-width/2 ; i < center[0]+width/2 ; i+=stepX ) {
-		for ( j = center[1]-height/2 ; j < center[1]+height/2 ; j+=stepY) {
+	for ( i = 0 ; i < res[1] ; ++i ) {
+		y = center[1]+height/2 - i*stepY;
+		for ( j = 0 ; j < res[0] ; ++j) {
+			x = center[0]-width/2 + j*stepX;
+			zx = x ; zy = y;
 			//fprintf(prueba," numero: %f+%fi %d ",i,j,getIntensity(i,j));
-			fprintf(prueba,"%d",getIntensity(i,j));
+			//fprintf(prueba,"%d",getIntensity(i,j));
+			for ( k = 0 ; k < MAX_VAL ; k++ ){
+				xtemp = zx *zx - zy*zy + x;
+				zy = 2*zx*zy + y;
+				zx = xtemp;
+				if (stop(zx,zy)){
+					intensity = k;
+					break;
+				}
+			}
+			fprintf(prueba,"%d",intensity);
 			fputc(' ',prueba);
 		}
 		fputc('\n',prueba);
@@ -117,21 +133,19 @@ int print(int* res, double* center, double width , double height){
 }
 
 unsigned char getIntensity(double re, double im){
-	unsigned char i;
-	unsigned char intensity = MAX_VAL;
-	double auxRe =re ;
-	double auxIm =im ;
-	for( i = 0 ; i < MAX_VAL ; i++ ){
-		//printf( "stop: %d , [%f,%f]\n" ,stop(auxRe,auxIm),auxRe,auxIm);
-		if ( stop(auxRe,auxIm) ){
-			intensity = i;
-			break;
-		}
-		auxRe = (auxRe * auxRe) - (auxIm * auxIm) + re;
-		auxIm = (2*auxRe*auxIm) + im;
-		//printf( "\t\t\t [%f,%f]\n" ,auxRe,auxIm);
-	}
-	return intensity;
+	//unsigned char i;
+	//zx = re ; 
+	//zy = im;
+	//for( i = 0 ; i < MAX_VAL ; i++ ){
+	//	//printf( "stop: %d , [%f,%f]\n" ,stop(auxRe,auxIm),auxRe,auxIm);
+	//	if ( stop(zx,zy) ){
+	//		intensity = i;
+	//		break;
+	//	}
+	//	xtemp = zx *zx - zy*zy + re;
+	//	//printf( "\t\t\t [%f,%f]\n" ,auxRe,auxIm);
+	//}
+	//return intensity;
 }
 
 int parseResolution(char* str, int* res){
