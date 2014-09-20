@@ -97,6 +97,7 @@ int print(int* res, double* center, double width , double height){
 	FILE* prueba;
 	prueba = fopen("prueba.pgm","wb");
 	printf("width : %f \t height: %f \n",width,height);
+	printf("x  : %f \t y: %f \n",center[0],center[1]);
 	double stepX = width / res[0];
 	double stepY = height/ res[1];
 	printf("stepX: %f \t stepY: %f \n",stepX,stepY);
@@ -104,7 +105,6 @@ int print(int* res, double* center, double width , double height){
 	double x, y;
 	fprintf(prueba, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
 	double zx, zy;
-	double xtemp;
 	double zx2, zy2;
 	unsigned char intensity = MAX_VAL;
 
@@ -116,13 +116,14 @@ int print(int* res, double* center, double width , double height){
 			//fprintf(prueba," numero: %f+%fi %d ",i,j,getIntensity(i,j));
 			//fprintf(prueba,"%d",getIntensity(i,j));
 			for ( k = 0 ; k < MAX_VAL ; k++ ){
-				xtemp = zx *zx - zy*zy + x;
-				zy = 2*zx*zy + y;
-				zx = xtemp;
-				if (stop(zx,zy)){
+				zx2 = zx*zx;
+				zy2 = zy*zy;
+				if (zx2 + zy2 > 4){
 					intensity = k;
 					break;
 				}
+				zy = 2*zx*zy + y;
+				zx = zx2 - zy2 + x;
 			}
 			fprintf(prueba,"%d",intensity);
 			fputc(' ',prueba);
