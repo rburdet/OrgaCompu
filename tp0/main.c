@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
-#include <math.h>
 
 #define MAX_VAL 255
 
@@ -106,26 +105,26 @@ int print(int* res, double* center, double width , double height){
 	fprintf(prueba, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
 	double zx, zy;
 	double zx2, zy2;
-	unsigned char intensity = MAX_VAL;
+	int intensity = MAX_VAL;
 
 	for ( i = 0 ; i < res[1] ; ++i ) {
-		y = center[1]+height/2 - i*stepY;
+		y = center[1]-height/2 + i*stepY;
 		for ( j = 0 ; j < res[0] ; ++j) {
 			x = center[0]-width/2 + j*stepX;
-			zx = x ; zy = y;
+			//zx = x ; zy = y;
+			zx = 0;
+			zy = 0;
+			zx2 = zx*zx;
+			zy2 = zy*zy;
 			//fprintf(prueba," numero: %f+%fi %d ",i,j,getIntensity(i,j));
 			//fprintf(prueba,"%d",getIntensity(i,j));
-			for ( k = 0 ; k < MAX_VAL ; k++ ){
-				zx2 = zx*zx;
-				zy2 = zy*zy;
-				if (zx2 + zy2 > 4){
-					intensity = k;
-					break;
-				}
+			for ( k = 0 ; k < MAX_VAL && ((zx2+zy2)<4); k++ ){
 				zy = 2*zx*zy + y;
 				zx = zx2 - zy2 + x;
+				zx2 = zx*zx;
+				zy2 = zy*zy;
 			}
-			fprintf(prueba,"%d",intensity);
+			fprintf(prueba,"%d",k);
 			fputc(' ',prueba);
 		}
 		fputc('\n',prueba);
@@ -197,7 +196,7 @@ void version(char* name){
 }
 
 int stop(double re, double im){
-	if (sqrt((re*re)+(im*im))>2)
+	if ((re*re)+(im*im)>4)
 		return 1;
 	return 0;
 }
