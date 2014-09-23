@@ -32,13 +32,16 @@ int parseCenter(char* center, double* centerArray);
 
 int stop(double re, double im);
 
+/** Dados los parametros de interes calcula los conjuntos de mandelbrot
+ * @param int* vector de 2 enteros para especificar la resolucion
+ * @param double* vector de 2 doubles para especificar la coordenada de origen
+ * @param double ancho del rectangulo a graficar
+ * @param double alto del rectangulo a graficar
+ * @param FILE* archivo donde escribe los conjuntos en formato pgm
+ * return int 0 si no hubo error
+ */ 
+int print(int* res, double* center, double width , double height,FILE* file);
 
-/** Dado un numero complejo asociado a un pixel de la pantalla devuelve la intensidad asociada a ese pixel segun el algoritmo para mostrar conjuntos de Mandelbrot
- * @param double parte real del complejo asociado a un pixel
- * @param double parte imaginaria del complejo asociado a un pixel
- * return char intensidad de ese pixel
- */
-unsigned char getIntensity(double re, double im);
 
 int main(int argc, char* argv[]){
 	int opt;
@@ -47,7 +50,9 @@ int main(int argc, char* argv[]){
 	double  height = 4;
 	double center[2] = {0,0};
 	char* outDir;
-
+	FILE* file = stdout;
+	int parseCenterResult = 0;
+	int parseResolutionResult = 0;
 
 	static struct option long_options[] ={
 		{"resolution",	optional_argument,		0,	'r'},
@@ -63,19 +68,19 @@ int main(int argc, char* argv[]){
 	while ((opt = getopt_long (argc, argv, "r:c:w:H:o:Vh", long_options, NULL)) != -1){
 		switch(opt){
 			case 'r':
-				parseResolution(optarg,res);
+				parseResolutionResult =parseResolution(optarg,res);
 				break;
 			case 'w':
-				width = atoi(optarg);
+				width = atof(optarg);
 				break;
 			case 'H':
-				height = atoi(optarg);
+				height = atof(optarg);
 				break;
 			case 'o':
 				outDir = optarg;
 				break;
 			case 'c':
-				parseCenter(optarg,center);
+				parseCenterResult = parseCenter(optarg,center);
 				break;
 			case 'h':
 				usage(argv[0]);
@@ -88,67 +93,84 @@ int main(int argc, char* argv[]){
 				break;
 		}
 	}
-	print(res,center,width,height);
-		//printf( "%d \n ", getIntensity(center[0],center[1]));
+	if (parseCenterResult == -1){
+		usage(argv[0]);
+		fprintf(stderr, "fatal: invalid center specification.\n");
+		return -1;
+	}
+
+	if (parseResolutionResult == -1){
+		usage(argv[0]);
+		fprintf(stderr, "fatal: invalid resolution specification.\n");
+		return -1;
+	}
+
+	if (outDir==NULL){
+		return -1;
+	}
+	
+	if (strcmp(outDir,"-") != 0){
+		file = fopen(outDir,"w");
+		if (!file){
+			usage(argv[0]);
+			fprintf(stderr, "fatal: cannot open output file.\n");
+			return -1;
+		}
+	}
+
+	if (res[0] <= 0 || res[1] <= 0)
+		usage(argv[0]);
+	else{
+		fprintf(file, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
+		if (res[0] == 1 && res[1] == 1){
+			int aux = MAX_VAL;
+			if ((center[0]*center[0] + center[1]*center[1]) > 4 ){
+				aux = 0;
+			}
+			fprintf(file,"%d",aux);
+			fputc('\n',file);
+		}
+		else
+			print(res,center,width,height,file);
+	}
+
+	if (file != stdout)
+		fclose(file);
+
 }
 
-int print(int* res, double* center, double width , double height){
-	FILE* prueba;
-	prueba = fopen("prueba.pgm","wb");
-	printf("width : %f \t height: %f \n",width,height);
-	printf("x  : %f \t y: %f \n",center[0],center[1]);
+int print(int* res, double* center, double width , double height,FILE* file){
 	double stepX = width / res[0];
 	double stepY = height/ res[1];
-	printf("stepX: %f \t stepY: %f \n",stepX,stepY);
 	int i, j, k;
 	double x, y;
-	fprintf(prueba, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
 	double zx, zy;
 	double zx2, zy2;
-	int intensity = MAX_VAL;
-
 	for ( i = 0 ; i < res[1] ; ++i ) {
-		y = center[1]-height/2 + i*stepY;
+		y = center[1]+height/2 - i*stepY;
 		for ( j = 0 ; j < res[0] ; ++j) {
 			x = center[0]-width/2 + j*stepX;
-			//zx = x ; zy = y;
 			zx = 0;
 			zy = 0;
 			zx2 = zx*zx;
 			zy2 = zy*zy;
-			//fprintf(prueba," numero: %f+%fi %d ",i,j,getIntensity(i,j));
-			//fprintf(prueba,"%d",getIntensity(i,j));
-			for ( k = 0 ; k < MAX_VAL && ((zx2+zy2)<4); k++ ){
+			for ( k = 0 ; k < MAX_VAL && !stop(zx,zy); k++ ){
 				zy = 2*zx*zy + y;
 				zx = zx2 - zy2 + x;
 				zx2 = zx*zx;
 				zy2 = zy*zy;
 			}
-			fprintf(prueba,"%d",k);
-			fputc(' ',prueba);
+			fprintf(file,"%d",k);
+			fputc(' ',file);
 		}
-		fputc('\n',prueba);
+		fputc('\n',file);
 	} 
-	fclose(prueba);
-}
-
-unsigned char getIntensity(double re, double im){
-	//unsigned char i;
-	//zx = re ; 
-	//zy = im;
-	//for( i = 0 ; i < MAX_VAL ; i++ ){
-	//	//printf( "stop: %d , [%f,%f]\n" ,stop(auxRe,auxIm),auxRe,auxIm);
-	//	if ( stop(zx,zy) ){
-	//		intensity = i;
-	//		break;
-	//	}
-	//	xtemp = zx *zx - zy*zy + re;
-	//	//printf( "\t\t\t [%f,%f]\n" ,auxRe,auxIm);
-	//}
-	//return intensity;
+	return 0;
 }
 
 int parseResolution(char* str, int* res){
+	if (strlen(str) < 3)
+		return -1;
 	char* aux ;
 	if ( ( aux = strtok(str,"x")) != NULL){
 		res[0] = atoi(aux);
@@ -156,14 +178,14 @@ int parseResolution(char* str, int* res){
 		res[1] = atoi(aux);
 	}else
 		return -1;
-	printf("%d \n",res[0]);
-	printf("%d \n",res[1]);
 	return 0;
 }
 
 int parseCenter(char* str, double* center){
+	if (str[strlen(str)-1] != 'i'){
+		return -1;
+	}
 	char* aux = calloc(strlen(str),sizeof(char));
-	char* first;
 	int i;
 	int pos;
 	int real = 1;
@@ -188,6 +210,7 @@ int parseCenter(char* str, double* center){
 	}
 	aux[strlen(aux)-1] = '\0';
 	center[1] = signI *atof(aux);
+	return 0;
 }
 
 
@@ -213,5 +236,6 @@ void usage(char* name){
 	printf("Examples: \n");
 	printf("\t %s -o uno.pgm \n",name);
 	printf("\t %s -c +0.282-0.01i -w 0.005 -H 0.005 -o dos.pgm \n",name);
+	printf("\t %s -r 1x1 -o - \n",name);
 }
 

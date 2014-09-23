@@ -1,0 +1,164 @@
+% ------ Clase de documento ------
+\documentclass[a4paper,10pt,oneside]{article}
+
+%-------------------------------------Paquetes-----------------------------------------------------------------------
+\usepackage[spanish]{babel}  % Traduce los textos a castellano
+\usepackage[utf8]{inputenc}	% Permite escribir directamente áéíóúñ
+\usepackage{t1enc}            	% Agrega caracteres extendidos al font
+\usepackage{amsmath} 		%Permite imprimir mas opcciones matematicas
+\usepackage{graphicx}		%Permite agregar imagenes al informe
+\usepackage{multicol}  		%Permite dividir el texto en varias columnas
+\usepackage{anysize}		%Permite modificar los margenes del documento
+\usepackage{float} 			%Permite utilizar H para colocar las imagenes en un lugar especifico 
+\usepackage{multirow}		%Permite dividir las tablas en subtablas
+\usepackage{booktabs}		%Permiten manejar mejor el tamaño de las tablas
+\usepackage{tabulary}		%Permiten manejar mejor el tamaño de las tablas
+\usepackage{fancyhdr}		%Permite agregar encabezado y pie fancy
+
+\usepackage{courier}		%
+\usepackage{color}			%
+\usepackage{listings}  		%Permite agregar codigo directamente sobre el documento
+
+%---------------------------------------Definiciones propias---------------------------------------------------------
+\newcommand{\grad}{\hspace{-2mm}$\phantom{a}^{\circ}$} %El º que no existe como comando
+\newcommand{\oiint}{\displaystyle\bigcirc\!\!\!\!\!\!\!\!\int\!\!\!\!\!\int} %Integral doble cerrada
+%------------------------------------------------------------------------------------------------------------------------
+
+%-------------------------------------Configuracion De Codigo----------------------------------
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+
+\lstset{language=C,
+	breaklines=true,
+	keywordstyle=\bf\color{blue},
+	commentstyle=\tt\it\color{dkgreen},
+	stringstyle=\color{gray},
+ 	numbers=left,
+	numberstyle=\tiny\color{black},
+	stepnumber=2,
+	numbersep=8pt,
+	backgroundcolor=\color{white},
+	tabsize=4,
+	showspaces=false,
+	showstringspaces=false}
+
+\newcommand{\captionlisting}[2][]{%
+    \lstinputlisting[caption={\large{\detokenize{#2}}},#1]{#2}%
+}
+
+\renewcommand\lstlistingname{Archivo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% ------ Configuración ------
+\title{\textbf{66.20 Organización de Computadoras\\ Trabajo Práctico 0: \\ Infraestructura básica}}
+
+\author{	Burdet Rodrigo, \textit{Padrón Nro. 93440}\\
+            \texttt{ rodrigoburdet@gmail.com}\\\\
+            Colangelo Federico, \textit{Padrón Nro. 89869}                     \\
+            \texttt{ federico.colangelo@semperti.com}\\\\
+            Manzano Matias, \textit{Padrón Nro. 83425}                     \\
+            \texttt{ matsebman@gmail.com }\\\\[2.5ex]
+            \normalsize{2do. Cuatrimestre de 2014}                       \\
+			\normalsize{66.20 Organización de Computadoras}\\
+            \normalsize{Facultad de Ingeniería, Universidad de Buenos Aires}            \\
+       }
+\date{\today}
+
+
+
+% ----- Cuerpo del documento -----
+\begin{document}
+\maketitle
+
+\thispagestyle{empty}
+
+\newpage
+
+\section{Objetivos}
+    Familiarizarse con las herramientas de software que usaremos en los siguientes trabajos, implementando un programa (y su correspondiente documentación) que resuelva el problema piloto que presentaremos mas abajo.
+
+\section{Resumen}
+	En el presente trabajo, se implementó un algoritmo que permite graficar los conjuntos de Mandelbrot dados ciertos parámetros para permitir centrarnos en una región en particular de dicho conjunto.
+	El programa fue realizado en c 99 en un entorno de desarrollo linux. Compilado en Linux y en un ambiente emulado NetBSD.
+
+\section{Desarrollo}
+	
+\subsection{Paso 1: Configuración de Entorno de Desarrollo}
+El primer paso fue configurar el entorno de desarrollo, de acuerdo a la guía facilitada por la cátedra. \\
+Trabajamos con distribuciones Linux y con el GxEmul proporcionado por la cátedra, emulando un sistema NetBSD.	
+\subsection{Paso 2: Implementación del programa}
+El programa debe ejecutarse por línea de comando y la salida del mismo dependerá del valor de los argumentos con los que se lo haya invocado.
+\subsubsection{Ingreso de parámetros}
+El formato para invocar al programa es el siguiente:
+\begin{center}
+	\texttt{./tp0 [OPTIONS]}
+\end{center}
+Los parámetros válidos que puede recibir el programa son los siguientes: \\ 
+
+\begin{ttfamily}
+\begin{tabular}{lll}
+
+\bf{-o,} & \bf{--output} &(Parámetro obligatorio. Especifica archivo de salida, - para stdout). \\
+\bf{-r,} & \bf{--resolution} &(Resolución de la imagen de salida).\\
+\bf{-c,} & \bf{--center} &(Centro de la imagen).\\
+\bf{-w,} & \bf{--width} &(Ancho del rectángulo a dibujar).\\
+\bf{-H,} & \bf{--height} &(Alto del rectángulo a dibujar).\\
+\bf{-v,} & \bf{--version} 	&(Muestra la versión).\\
+\bf{-h,} & \bf{--help} &(Muestra la ayuda).\\
+\end{tabular}
+\end{ttfamily}
+
+\subsubsection{Interpretación de parámetros}
+Para parsear los parámetros se usó la librería de GNU getopt, en particular se usó \texttt{getopt\_long} para permitir el pasaje de parámetros largos.
+			
+	\section{Compilación del programa}
+	
+	Para poder compilar el proyecto, se debe abrir una terminal Linux dentro del directorio donde se encuentra el código 
+	fuente escrito en C, y ejecutar el siguiente comando:
+	\begin{center}
+	\texttt{gcc -Wall -std=c99  main.c -o tp0}\footnote{Requiere tener instalado el compilador \it{GCC}} 
+	\end{center}
+		
+	 Esto generara un archivo ejecutable, llamado \textit{tp0}.
+
+	\section{Compilación del programa en NetBSD}
+	
+	Para poder compilar el proyecto en NetBSD, se debe ejecutar el comando:
+	
+	\begin{center}
+	\texttt{gcc -Wall -std=c99 -S -O0 main.c} 
+	\end{center}
+	
+	
+\section{Corridas de prueba y Mediciones}
+
+	En las figuras que siguen a continuación se muestran los comandos utilizados para ejecutar el programa y se puede apreciar los resultados de las diferentes pruebas que realizamos.	
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[width=0.50\textwidth]{uno.png}
+		\end{center}
+		\caption{Llamada por defecto ./tp0 -o uno.pgm} \label{Figura 1}
+	\end{figure}
+
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[width=0.80\textwidth]{dos.png}
+		\end{center}
+		\caption{Llamada haciendo zoom sobre la región centrada en (0.282 , -0.01) con cuadrado de 0.005 de lado. ./tp0 -c +0.282-0.01i -w 0.005 -H 0.005 -o dos.pgm } \label{Figura 2}
+	\end{figure}
+
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[width=0.50\textwidth]{tres.png}
+		\end{center}
+		\caption{Llamada haciendo zoom sobre la región centrada en (0.296 , -0.02) con cuadrado de 0.003 de lado. ./tp0 -c +0.296-0.02i -w 0.003 -H 0.003 -o tres.pgm } \label{Figura 3}
+	\end{figure}
+	
+	\newpage
+
+\section{Conclusiones}	
+	Como se enuncia en el objetivo de este trabajo práctico, aprendimos a instalar y manejar el GxEmul, a realizar transferencias de archivos en Linux, así como también compilar y ejecutar programas en el NetBSD. Por otro lado,  aprendimos a manejar y escribir informes en \LaTeX{}.
+	De este modo, estamos preparados para que en los próximos trabajos prácticos, nos aboquemos directamente al desarrollo de los mismos.
+
+\end{document}
+
