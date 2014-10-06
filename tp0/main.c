@@ -6,6 +6,7 @@
 #define MAX_VAL 255
 #define USAGE_ERROR -1
 #define IO_ERROR -2
+static const char VERSION[] = "1.0.1";
 
 void usage(char* nombre);
 void version(char* nombre);
@@ -55,6 +56,7 @@ int main(int argc, char* argv[]){
 	FILE* file = stdout;
 	int parseCenterResult = 0;
 	int parseResolutionResult = 0;
+	int noArguments = 0;
 
 	static struct option long_options[] ={
 		{"version",		no_argument,			0,	'V'},
@@ -71,32 +73,39 @@ int main(int argc, char* argv[]){
 		switch(opt){
 			case 'r':
 				parseResolutionResult = parseResolution(optarg,res);
+				noArguments++;
 				break;
 			case 'w':
 				width = atof(optarg);
+				noArguments++;
 				break;
 			case 'H':
 				height = atof(optarg);
+				noArguments++;
 				break;
 			case 'o':
 				outDir = optarg;
+				noArguments++;
 				break;
 			case 'c':
 				parseCenterResult = parseCenter(optarg,center);
+				noArguments++;
 				break;
 			case 'h':
 				usage(argv[0]);
 				return 0;
-				break;
 			case 'V':
 				version(argv[0]);
 				return 0;
-				break;
 			case '?':
 				printf("Error\n");
 				return USAGE_ERROR;
-				break;
 		}
+	}
+
+	if (noArguments == 0) {
+		usage(argv[0]);
+		return 0;
 	}
 
 	if (parseCenterResult == -1){
@@ -244,7 +253,7 @@ int parseCenter(char* str, double* center){
 
 
 void version(char* name){
-	printf("%s version: 1.0.0: \n",name);
+	printf("%s version: %s: \n",name, VERSION);
 }
 
 int stop(double re, double im){
