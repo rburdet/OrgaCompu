@@ -72,24 +72,24 @@ int main(int argc, char* argv[]){
 	while ((opt = getopt_long (argc, argv, "r:c:w:H:o:Vh", long_options, NULL)) != -1){
 		switch(opt){
 			case 'r':
-				parseResolutionResult = parseResolution(optarg,res);
 				noArguments++;
+				parseResolutionResult = parseResolution(optarg,res);
 				break;
 			case 'w':
-				width = atof(optarg);
 				noArguments++;
+				width = atof(optarg);
 				break;
 			case 'H':
-				height = atof(optarg);
 				noArguments++;
+				height = atof(optarg);
 				break;
 			case 'o':
-				outDir = optarg;
 				noArguments++;
+				outDir = optarg;
 				break;
 			case 'c':
-				parseCenterResult = parseCenter(optarg,center);
 				noArguments++;
+				parseCenterResult = parseCenter(optarg,center);
 				break;
 			case 'h':
 				usage(argv[0]);
