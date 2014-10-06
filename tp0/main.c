@@ -44,24 +44,25 @@ int print(int* res, double* center, double width , double height,FILE* file);
 
 
 int main(int argc, char* argv[]){
+	char* aux;
 	int opt;
 	int res[2] = {640,480};
 	double  width = 4;
 	double  height = 4;
 	double center[2] = {0,0};
-	char* outDir;
+	char* outDir = NULL;
 	FILE* file = stdout;
 	int parseCenterResult = 0;
 	int parseResolutionResult = 0;
 
 	static struct option long_options[] ={
-		{"resolution",	optional_argument,		0,	'r'},
-		{"center",		optional_argument,		0,	'c'},
-		{"width",		optional_argument,		0,	'w'},
-		{"height",		optional_argument,		0,	'H'},
+		{"version",		no_argument,			0,	'V'},
+		{"help",		no_argument,			0,	'h'},
+		{"resolution",	required_argument,		0,	'r'},
+		{"center",		required_argument,		0,	'c'},
+		{"width",		required_argument,		0,	'w'},
+		{"height",		required_argument,		0,	'H'},
 		{"output",		required_argument,		0,	'o'},
-		{"version",		optional_argument,		0,	'V'},
-		{"help",		optional_argument,		0,	'h'},
 		{0, 0, 0, 0}
 	};
 
@@ -84,15 +85,19 @@ int main(int argc, char* argv[]){
 				break;
 			case 'h':
 				usage(argv[0]);
+				return 0;
 				break;
 			case 'V':
 				version(argv[0]);
+				return 0;
 				break;
 			case '?':
 				printf("Error\n");
+				return -1;
 				break;
 		}
 	}
+
 	if (parseCenterResult == -1){
 		usage(argv[0]);
 		fprintf(stderr, "fatal: invalid center specification.\n");
@@ -122,21 +127,28 @@ int main(int argc, char* argv[]){
 		usage(argv[0]);
 	else{
 		fprintf(file, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
-		if (res[0] == 1 && res[1] == 1){
-			int aux = MAX_VAL;
-			if ((center[0]*center[0] + center[1]*center[1]) > 4 ){
-				aux = 0;
-			}
-			fprintf(file,"%d",aux);
-			fputc('\n',file);
-		}
-		else
+		//if (res[0] == 1 && res[1] == 1){
+		//	int aux = MAX_VAL;
+		//	if ((center[0]*center[0] + center[1]*center[1]) > 4 ){
+		//		aux = 0;
+		//	}
+		//	if (fprintf(file,"%d",aux) < 0){
+		//		fprintf(stderr,"No se pudo escribir al archivo\n");
+		//		return -1;
+		//	}
+		//	if (fputc('\n',file) < 0){
+		//		fprintf(stderr,"No se pudo escribir al archivo\n");
+		//		return -1;
+		//	}
+		//}
+		//else
 			print(res,center,width,height,file);
 	}
 
 	if (file != stdout)
 		fclose(file);
 
+	return 0;
 }
 
 int print(int* res, double* center, double width , double height,FILE* file){
@@ -146,29 +158,38 @@ int print(int* res, double* center, double width , double height,FILE* file){
 	double x, y;
 	double zx, zy;
 	double zx2, zy2;
-	for ( i = 0 ; i < res[1] ; ++i ) {
-		y = center[1]+height/2 - i*stepY;
-		for ( j = 0 ; j < res[0] ; ++j) {
-			x = center[0]-width/2 + j*stepX;
+	x= center[0] + (-width+stepX)/2;
+	y= center[1] + (-height+stepY)/2;
+	for ( i = 1 ; i <= res[1] ; ++i ) {
+		//y = center[1]+height/2 - i*stepY;
+			//printf("punto : %f , %f \n",x,y);
+		for ( j = 1 ; j <= res[0] ; ++j) {
+			//x = center[0]-width/2 + j*stepX;
+
+
 			zx = 0;
 			zy = 0;
 			zx2 = zx*zx;
 			zy2 = zy*zy;
-			for ( k = 0 ; k < MAX_VAL && !stop(zx,zy); k++ ){
+			for ( k = -1 ; k < MAX_VAL && !stop(zx,zy); k++ ){
 				zy = 2*zx*zy + y;
 				zx = zx2 - zy2 + x;
 				zx2 = zx*zx;
 				zy2 = zy*zy;
+				//printf("calculo : %f , %f \n",zx,zy);
 			}
 			fprintf(file,"%d",k);
 			fputc(' ',file);
+			x= center[0] + (-width+2*j*stepX)/2;
 		}
+		y= center[1] +(-height+2*i*stepY)/2;
 		fputc('\n',file);
 	} 
 	return 0;
 }
 
 int parseResolution(char* str, int* res){
+	printf("%s \n", str);
 	if (strlen(str) < 3)
 		return -1;
 	char* aux ;
@@ -186,7 +207,7 @@ int parseCenter(char* str, double* center){
 		return -1;
 	}
 	char* aux = calloc(strlen(str),sizeof(char));
-	int i;
+	unsigned int i;
 	int pos;
 	int real = 1;
 	int signR = 1;
