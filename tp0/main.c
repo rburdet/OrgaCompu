@@ -4,6 +4,8 @@
 #include <string.h>
 
 #define MAX_VAL 255
+#define USAGE_ERROR -1
+#define IO_ERROR -2
 
 void usage(char* nombre);
 void version(char* nombre);
@@ -93,40 +95,44 @@ int main(int argc, char* argv[]){
 				break;
 			case '?':
 				printf("Error\n");
-				return -1;
+				return USAGE_ERROR;
 				break;
 		}
 	}
 
 	if (parseCenterResult == -1){
 		usage(argv[0]);
-		fprintf(stderr, "fatal: invalid center specification.\n");
-		return -1;
+		if (fprintf(stderr, "fatal: invalid center specification.\n") < 0)
+			return IO_ERROR;
+		return USAGE_ERROR;
 	}
 
 	if (parseResolutionResult == -1){
 		usage(argv[0]);
-		fprintf(stderr, "fatal: invalid resolution specification.\n");
-		return -1;
+		if (fprintf(stderr, "fatal: invalid resolution specification.\n") < 0)
+			return IO_ERROR;
+		return USAGE_ERROR;
 	}
 
 	if (outDir==NULL){
-		return -1;
+		return USAGE_ERROR;
 	}
 
 	if (strcmp(outDir,"-") != 0){
 		file = fopen(outDir,"w");
 		if (!file){
 			usage(argv[0]);
-			fprintf(stderr, "fatal: cannot open output file.\n");
-			return -1;
+			if (fprintf(stderr, "fatal: cannot open output file.\n") < 1)
+				return IO_ERROR;
+			return USAGE_ERROR;
 		}
 	}
 
 	if (res[0] <= 0 || res[1] <= 0)
 		usage(argv[0]);
 	else{
-		fprintf(file, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL);
+		if (fprintf(file, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL) < 0)
+			return IO_ERROR;
 		//if (res[0] == 1 && res[1] == 1){
 		//	int aux = MAX_VAL;
 		//	if ((center[0]*center[0] + center[1]*center[1]) > 4 ){
@@ -134,11 +140,11 @@ int main(int argc, char* argv[]){
 		//	}
 		//	if (fprintf(file,"%d",aux) < 0){
 		//		fprintf(stderr,"No se pudo escribir al archivo\n");
-		//		return -1;
+		//		return USAGE_ERROR;
 		//	}
 		//	if (fputc('\n',file) < 0){
 		//		fprintf(stderr,"No se pudo escribir al archivo\n");
-		//		return -1;
+		//		return USAGE_ERROR;
 		//	}
 		//}
 		//else
@@ -178,32 +184,35 @@ int print(int* res, double* center, double width , double height,FILE* file){
 				zy2 = zy*zy;
 				//printf("calculo : %f , %f \n",zx,zy);
 			}
-			fprintf(file,"%d",k);
-			fputc(' ',file);
+			if (fprintf(file,"%d",k) < 0)
+				return IO_ERROR;
+			if (fputc(' ',file) < 0)
+				return IO_ERROR;
 			x= center[0] + (-width+2*j*stepX)/2;
 		}
 		y= center[1] +(-height+2*i*stepY)/2;
-		fputc('\n',file);
+		if (fputc('\n',file) < 0)
+			return IO_ERROR;
 	}
 	return 0;
 }
 
 int parseResolution(char* str, int* res){
 	if (strlen(str) < 3)
-		return -1;
+		return USAGE_ERROR;
 	char* aux ;
 	if ( ( aux = strtok(str,"x")) != NULL){
 		res[0] = atoi(aux);
 		aux = strtok(NULL,"x");
 		res[1] = atoi(aux);
 	}else
-		return -1;
+		return USAGE_ERROR;
 	return 0;
 }
 
 int parseCenter(char* str, double* center){
 	if (str[strlen(str)-1] != 'i'){
-		return -1;
+		return USAGE_ERROR;
 	}
 	char* aux = calloc(strlen(str),sizeof(char));
 	unsigned int i;
