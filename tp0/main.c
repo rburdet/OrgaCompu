@@ -46,7 +46,6 @@ int print(int* res, double* center, double width , double height,FILE* file);
 
 
 int main(int argc, char* argv[]){
-	char* aux;
 	int opt;
 	int res[2] = {640,480};
 	double  width = 4;
