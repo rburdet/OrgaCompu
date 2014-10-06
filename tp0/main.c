@@ -152,7 +152,8 @@ int main(int argc, char* argv[]){
 	}
 
 	if (file != stdout)
-		fclose(file);
+		if (fclose(file) < 0)
+			return IO_ERROR;
 
 	return 0;
 }
