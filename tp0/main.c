@@ -8,7 +8,7 @@
 void usage(char* nombre);
 void version(char* nombre);
 
-/** Dada una resolucion en formato WIDTHxHEIGHT devuelve un vector [WIDTH,HEIGHT] por defecto es [640,480] 
+/** Dada una resolucion en formato WIDTHxHEIGHT devuelve un vector [WIDTH,HEIGHT] por defecto es [640,480]
  * @param char* String con resolucion del tipo WIDTHxHEIGHT
  * @param int* vector de ints de resolucion [WIDTH,HEIGHT]
  * @return int 0 si se pudo parsear la resolucion, -1 en otro caso
@@ -16,7 +16,7 @@ void version(char* nombre);
 
 int parseResolution(char* res,int* resArray);
 
-/** Dada una coordenada compleja en representacion binomica ( a + bi ) devuelve un vector [posX, posY], por defecto es [0,0] 
+/** Dada una coordenada compleja en representacion binomica ( a + bi ) devuelve un vector [posX, posY], por defecto es [0,0]
  * @param char* String con posicion del centro de pantalla en forma binomica a+bi
  * @param double* vector de ints de centro [posX,posY]
  * @return int 0 si se pudo parsear la resolucion, -1 en otro caso
@@ -39,7 +39,7 @@ int stop(double re, double im);
  * @param double alto del rectangulo a graficar
  * @param FILE* archivo donde escribe los conjuntos en formato pgm
  * return int 0 si no hubo error
- */ 
+ */
 int print(int* res, double* center, double width , double height,FILE* file);
 
 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]){
 	while ((opt = getopt_long (argc, argv, "r:c:w:H:o:Vh", long_options, NULL)) != -1){
 		switch(opt){
 			case 'r':
-				parseResolutionResult =parseResolution(optarg,res);
+				parseResolutionResult = parseResolution(optarg,res);
 				break;
 			case 'w':
 				width = atof(optarg);
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]){
 	if (outDir==NULL){
 		return -1;
 	}
-	
+
 	if (strcmp(outDir,"-") != 0){
 		file = fopen(outDir,"w");
 		if (!file){
@@ -184,12 +184,11 @@ int print(int* res, double* center, double width , double height,FILE* file){
 		}
 		y= center[1] +(-height+2*i*stepY)/2;
 		fputc('\n',file);
-	} 
+	}
 	return 0;
 }
 
 int parseResolution(char* str, int* res){
-	printf("%s \n", str);
 	if (strlen(str) < 3)
 		return -1;
 	char* aux ;
@@ -259,4 +258,3 @@ void usage(char* name){
 	printf("\t %s -c +0.282-0.01i -w 0.005 -H 0.005 -o dos.pgm \n",name);
 	printf("\t %s -r 1x1 -o - \n",name);
 }
-
