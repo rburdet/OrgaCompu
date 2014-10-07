@@ -18,6 +18,7 @@
 \usepackage{courier}		%
 \usepackage{color}			%
 \usepackage{listings}  		%Permite agregar codigo directamente sobre el documento
+\usepackage{textcomp}
 
 %---------------------------------------Definiciones propias---------------------------------------------------------
 \newcommand{\grad}{\hspace{-2mm}$\phantom{a}^{\circ}$} %El º que no existe como comando
@@ -27,20 +28,44 @@
 %-------------------------------------Configuracion De Codigo----------------------------------
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{gray99}{gray}{.99}
+\definecolor{gray95}{gray}{.95}
+\definecolor{gray75}{gray}{.75}
+\definecolor{gray50}{gray}{.50}
+\definecolor{keywords_blue}{rgb}{0.13,0.13,1}
+\definecolor{comments_green}{rgb}{0,0.5,0}
+\definecolor{strings_red}{rgb}{0.9,0,0}
+%\captionsetup[lstlisting]{format=listing,labelfont=style_labelfont,textfont=style_textfont}%
 
-\lstset{language=C,
-	breaklines=true,
-	keywordstyle=\bf\color{blue},
-	commentstyle=\tt\it\color{dkgreen},
-	stringstyle=\color{gray},
- 	numbers=left,
-	numberstyle=\tiny\color{black},
-	stepnumber=2,
-	numbersep=8pt,
-	backgroundcolor=\color{white},
-	tabsize=4,
-	showspaces=false,
-	showstringspaces=false}
+\lstset{
+	aboveskip = {1.5\baselineskip},
+	backgroundcolor = \color{gray99},
+	basicstyle = \ttfamily\footnotesize,
+	breakatwhitespace = true,   
+	breaklines = true,
+	captionpos = t,
+	columns = fixed,
+	commentstyle = \color{comments_green},
+	escapeinside = {\%*}{*)}, 
+	extendedchars = true,
+	frame = lines,
+	keywordstyle = \color{keywords_blue}\bfseries,
+	language = C,                       
+	numbers = left,
+	numbersep = 5pt,
+	numberstyle = \tiny\ttfamily\color{gray50},
+	prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+	rulecolor = \color{gray75},
+	showspaces = false,
+	showstringspaces = false, 
+	showtabs = false,
+	stepnumber = 1,
+	stringstyle = \color{strings_red},                                    
+	tabsize = 2,
+	title = \null, % Default value: title=\lstname
+	upquote = true,                  
+}
+
 
 \newcommand{\captionlisting}[2][]{%
     \lstinputlisting[caption={\large{\detokenize{#2}}},#1]{#2}%
@@ -160,5 +185,19 @@ Para parsear los parámetros se usó la librería de GNU getopt, en particular s
 	Como se enuncia en el objetivo de este trabajo práctico, aprendimos a instalar y manejar el GxEmul, a realizar transferencias de archivos en Linux, así como también compilar y ejecutar programas en el NetBSD. Por otro lado,  aprendimos a manejar y escribir informes en \LaTeX{}.
 	De este modo, estamos preparados para que en los próximos trabajos prácticos, nos aboquemos directamente al desarrollo de los mismos.
 
+
+\newpage 
+\section{Código}
+\subsection{main.c}
+\lstset{ language = c }
+\lstinputlisting[label=maincode]{../main.c}
+
+\newpage 
+
+\subsection{main.s}
+\lstset{ language = [x86masm]assembler }
+\lstinputlisting[label=mainmipscode]{../main.s}
+
 \end{document}
+
 

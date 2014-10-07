@@ -141,21 +141,6 @@ int main(int argc, char* argv[]){
 	else{
 		if (fprintf(file, "P2\n%d\n%d\n%d\n", res[0],res[1],MAX_VAL) < 0)
 			return IO_ERROR;
-		//if (res[0] == 1 && res[1] == 1){
-		//	int aux = MAX_VAL;
-		//	if ((center[0]*center[0] + center[1]*center[1]) > 4 ){
-		//		aux = 0;
-		//	}
-		//	if (fprintf(file,"%d",aux) < 0){
-		//		fprintf(stderr,"No se pudo escribir al archivo\n");
-		//		return USAGE_ERROR;
-		//	}
-		//	if (fputc('\n',file) < 0){
-		//		fprintf(stderr,"No se pudo escribir al archivo\n");
-		//		return USAGE_ERROR;
-		//	}
-		//}
-		//else
 			print(res,center,width,height,file);
 	}
 
@@ -174,8 +159,8 @@ int print(int* res, double* center, double width , double height,FILE* file){
 	double zx, zy;
 	double zx2, zy2;
 	x= center[0] + (-width+stepX)/2;
-	y= center[1] + (-height+stepY)/2;
-	//printf("%f, %f punto \n", x, y);
+	//y= center[1] + (-height+stepY)/2;
+	y= center[1] + (height-stepY)/2;
 	for ( i = 1 ; i <= res[1] ; ++i ) {
 		//y = center[1]+height/2 - i*stepY;
 			//printf("punto : %f , %f \n",x,y);
@@ -200,7 +185,7 @@ int print(int* res, double* center, double width , double height,FILE* file){
 				return IO_ERROR;
 			x= center[0] + (-width+2*j*stepX)/2;
 		}
-		y= center[1] +(-height+2*i*stepY)/2;
+		y= center[1] +(height-2*i*stepY)/2;
 		if (fputc('\n',file) < 0)
 			return IO_ERROR;
 	}
