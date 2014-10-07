@@ -25,7 +25,7 @@ int parseResolution(char* res,int* resArray);
  * @return int 0 si se pudo parsear la resolucion, -1 en otro caso
  */
 
-int parseCenter(char* center, double* centerArray);
+int parseCenter(char* centerString, double* center);
 
 /** Dadas las partes real e imaginara de un numero complejo devuelve 1 si el modulo es mayor que 2, 0 en caso contrario
  * @param double parte real de un numero complejo
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]){
 		switch(opt){
 			case 'r':
 				noArguments++;
-				parseResolutionResult = parseResolution(optarg,res);
+				parseResolutionResult = parseResolution(optarg, res);
 				break;
 			case 'w':
 				noArguments++;
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]){
 				break;
 			case 'c':
 				noArguments++;
-				parseCenterResult = parseCenter(optarg,center);
+				parseCenterResult = parseCenter(optarg, center);
 				break;
 			case 'h':
 				usage(argv[0]);
@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
 		return USAGE_ERROR;
 	}
 
-	if (outDir==NULL){
+	if (outDir == NULL){
 		return USAGE_ERROR;
 	}
 
@@ -175,6 +175,7 @@ int print(int* res, double* center, double width , double height,FILE* file){
 	double zx2, zy2;
 	x= center[0] + (-width+stepX)/2;
 	y= center[1] + (-height+stepY)/2;
+	//printf("%f, %f punto \n", x, y);
 	for ( i = 1 ; i <= res[1] ; ++i ) {
 		//y = center[1]+height/2 - i*stepY;
 			//printf("punto : %f , %f \n",x,y);
@@ -219,19 +220,24 @@ int parseResolution(char* str, int* res){
 	return 0;
 }
 
-int parseCenter(char* str, double* center){
+int parseCenter(char* centerString, double* center){
+	/*
 	if (str[strlen(str)-1] != 'i'){
 		return USAGE_ERROR;
 	}
-	char* aux = calloc(strlen(str),sizeof(char));
-	unsigned int i;
+	char* aux = calloc(strlen(str)+1,sizeof(char));
+	unsigned int i = 0;
 	int pos;
 	int real = 1;
-	int signR = 1;
+	int signR;
 	int signI = 1;
+	if(str[0] == '+'|| str[0] != '-'){
+		signR = 1 ;
+		i++;
+	}
 	if(str[0]=='-')
 		signR = -1;
-	for (i = 1 ; i< strlen(str) ; i++){
+	for ( ; i< strlen(str) ; i++){
 		if (real){
 			aux[i-1] = str[i];
 			if (str[i] == '-' || str[i] == '+'){
@@ -248,6 +254,41 @@ int parseCenter(char* str, double* center){
 	}
 	aux[strlen(aux)-1] = '\0';
 	center[1] = signI *atof(aux);
+	return 0;
+
+	//////////////////////////
+
+	if (centerString[strlen(centerString)-1] != 'i'){
+		return USAGE_ERROR;
+	}
+	center[0] = atof(strtok(centerString, "+i"));
+	center[1] = atof(strtok(NULL, "+i"));
+	return 0;
+	*/
+	int realSign = 1;
+	int complexSign = 1;
+	unsigned int i = 1;
+	unsigned int found = 0;
+	if (centerString[strlen(centerString)-1] != 'i'){
+		return USAGE_ERROR;
+	}
+	if (centerString[0] == '-') {
+		realSign = -1;
+	}
+	while (found == 0 && i < strlen(centerString)) {
+		if (centerString[i] == '+') {
+			found = 1;
+		}
+		else if (centerString[i] == '-') {
+			found = 1;
+			complexSign = -1;
+		}
+		else {
+			i++;
+		}
+	}
+	center[0] = atof(strtok(centerString, "+-i")) * realSign;
+	center[1] = atof(strtok(NULL, "+-i")) * complexSign;
 	return 0;
 }
 
