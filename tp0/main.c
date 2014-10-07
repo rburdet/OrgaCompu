@@ -269,7 +269,7 @@ int parseCenter(char* centerString, double* center){
 	int complexSign = 1;
 	unsigned int i = 1;
 	unsigned int found = 0;
-	if (centerString[strlen(centerString)-1] != 'i'){
+	if (centerString[strlen(centerString)-1] != 'i') {
 		return USAGE_ERROR;
 	}
 	if (centerString[0] == '-') {
@@ -286,6 +286,9 @@ int parseCenter(char* centerString, double* center){
 		else {
 			i++;
 		}
+	}
+	if (found == 0) {
+		return USAGE_ERROR;
 	}
 	center[0] = atof(strtok(centerString, "+-i")) * realSign;
 	center[1] = atof(strtok(NULL, "+-i")) * complexSign;
