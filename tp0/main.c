@@ -159,13 +159,9 @@ int print(int* res, double* center, double width , double height,FILE* file){
 	double zx, zy;
 	double zx2, zy2;
 	x= center[0] + (-width+stepX)/2;
-	//y= center[1] + (-height+stepY)/2;
 	y= center[1] + (height-stepY)/2;
 	for ( i = 1 ; i <= res[1] ; ++i ) {
-		//y = center[1]+height/2 - i*stepY;
-			//printf("punto : %f , %f \n",x,y);
 		for ( j = 1 ; j <= res[0] ; ++j) {
-			//x = center[0]-width/2 + j*stepX;
 
 
 			zx = 0;
@@ -177,7 +173,6 @@ int print(int* res, double* center, double width , double height,FILE* file){
 				zx = zx2 - zy2 + x;
 				zx2 = zx*zx;
 				zy2 = zy*zy;
-				//printf("calculo : %f , %f \n",zx,zy);
 			}
 			if (fprintf(file,"%d",k) < 0)
 				return IO_ERROR;
@@ -206,50 +201,6 @@ int parseResolution(char* str, int* res){
 }
 
 int parseCenter(char* centerString, double* center){
-	/*
-	if (str[strlen(str)-1] != 'i'){
-		return USAGE_ERROR;
-	}
-	char* aux = calloc(strlen(str)+1,sizeof(char));
-	unsigned int i = 0;
-	int pos;
-	int real = 1;
-	int signR;
-	int signI = 1;
-	if(str[0] == '+'|| str[0] != '-'){
-		signR = 1 ;
-		i++;
-	}
-	if(str[0]=='-')
-		signR = -1;
-	for ( ; i< strlen(str) ; i++){
-		if (real){
-			aux[i-1] = str[i];
-			if (str[i] == '-' || str[i] == '+'){
-				pos = i;
-				center[0]= signR * atof(aux);
-				real = 0;
-				memset(aux,'\0',strlen(str));
-			}
-		}else{
-			if (str[pos] == '-')
-				signI = -1;
-			aux[i-pos-1] = str[i];
-		}
-	}
-	aux[strlen(aux)-1] = '\0';
-	center[1] = signI *atof(aux);
-	return 0;
-
-	//////////////////////////
-
-	if (centerString[strlen(centerString)-1] != 'i'){
-		return USAGE_ERROR;
-	}
-	center[0] = atof(strtok(centerString, "+i"));
-	center[1] = atof(strtok(NULL, "+i"));
-	return 0;
-	*/
 	int realSign = 1;
 	int complexSign = 1;
 	unsigned int i = 1;
