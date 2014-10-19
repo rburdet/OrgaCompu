@@ -44,10 +44,15 @@ mips32_plot:
 	# al cruzar la interfaz de llamadas al sistema, algo que
         # no ocurre en el caso de llamadas a procedimientos.
 	#
-	li	v0, 1 # ver dentro de <sys/syscall.h>.
-	li	a0, 1         # a0: standard output file descriptor.
-	li	a1, 2       # a1: data pointer.
-	li	a2, 1     # a2: longitud, según mystrlen().
+	#li	v0, 1 # ver dentro de <sys/syscall.h>.
+	#li	a0, 1         # a0: standard output file descriptor.
+	#li	a1, 2       # a1: data pointer.
+	#li	a2, 1     # a2: longitud, según mystrlen().
+
+	li v0,SYS_write
+	lw a0,32(sp)
+	la a1,msg
+	lw a2,8(sp)
 	syscall
 
 	# Volvemos al sistema operativo, devolviendo un código 
