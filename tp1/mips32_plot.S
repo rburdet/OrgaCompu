@@ -1,4 +1,5 @@
 # Similar a 00-holamundo.S (imprime un mensaje por salida 
+
 # estándar, usando write(2)); pero, en este caso, vamos a
 # calcular dinámicamente la longitud del string impreso.
 #
@@ -30,6 +31,12 @@ mips32_plot:
 	move	$fp, sp
 
 
+	li	v0,SYS_write
+	addiu	a0,zero,1
+	addiu	a1,zero,20
+	addiu	a2,zero,4
+	syscall
+
 	#salvo a0
 	sw	a0,32(sp)
 	lw	t1,32(sp)
@@ -49,11 +56,20 @@ mips32_plot:
 	#li	a1, 2       # a1: data pointer.
 	#li	a2, 1     # a2: longitud, según mystrlen().
 
-	li v0,SYS_write
-	lw a0,32(sp)
-	la a1,msg
-	lw a2,8(sp)
-	syscall
+	#con esto imprimo texto
+	#li v0,SYS_write
+	#li a0,0
+	#la a1,msg
+	#lw a2,8(sp)
+	#syscall
+
+	#PRINTF FUNCIONANDO, imprime t0!! 
+	addiu	t0,10
+	la	a0,print
+	move	a1,t0
+	lw	t9,%call16(printf)(gp)
+	jalr	t9
+
 
 	# Volvemos al sistema operativo, devolviendo un código 
 	# de retorno nulo.
@@ -100,3 +116,6 @@ mystrlen_return:
 	.rdata
 msg:
 	.asciiz	"Hola mundo.\n"
+
+print:
+	.asciiz "valor : %d \n"
