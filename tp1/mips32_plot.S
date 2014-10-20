@@ -1,22 +1,9 @@
-# Similar a 00-holamundo.S (imprime un mensaje por salida 
-
-# estándar, usando write(2)); pero, en este caso, vamos a
-# calcular dinámicamente la longitud del string impreso.
-#
-# Para esto, escribimos un método, mystrlen(), que opera sobre
-# un string, calculando y retornando, su longitud.
-#
-# Además, y debido a que este programa hace llamadas a código
-# en funciones, deberemos respetar la ABI usada en el sistema.
-#
-# $Date: 2008/04/21 17:24:06 $
-
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
+#mips32_plot(param_t *);
 	.text
 	.align	2
-
 	.globl	mips32_plot
 	.ent	mips32_plot
 mips32_plot:
@@ -29,19 +16,67 @@ mips32_plot:
 	sw	ra,  28(sp)
 	sw	$fp, 24(sp)
 	move	$fp, sp
+	sw	a0,	32(sp)
+	sw	a1,	36(sp)
+	sw	a2,	40(sp)
+	sw	a3,	44(sp)
+
+	#ESTO FUNCIONA =)
+	sw	a0,32(sp)	#salvo a0 en stack
+	la	t0,0(a0)
+	lw	t0,36(t0)	#cargo en t0 el FILE*
+	lhu	t0,14(t0)	#me muevo al campo _file mediante un short
+	sw	t0,48(sp)	#guardo el file descriptor 
+
+	#mock para pruebas 
+	#define	UL_im	-2.0
+	#define y_res	480
+	#define	UL_re	-2.0
+	#define d_im	4
+
+	move	t3,zero
+	li	s3,255
+
+d_zero : .double 0.0
+d_limit : .double 4.0
+d_three : .double 3.0
+	
+	l.d	$f0,d_zero	#f0 cr
+	l.d	$f2,d_zero	#f2 ci
+	l.d	$f4,d_zero	#f4 zr
+	l.d	$f6,d_zero	#f6 zi
+	l.d	$f8,d_zero	#f8 sr
+	l.d	$f10,d_zero	#f10 si
+	l.d	$f12,d_zero	#f12 absz
+	l.d	$f14,d_limit#f14 4.00
+	l.d $f16,d_zero	#f16 registro temporal1
+	l.d $f18,d_three#f18 registro temporal2
+
+	#esto no compila y no se xq 
+	#c.gt.d	$f12,$f14
+	bc1t	loop2
+	mul.d	$f16,$f4,$f4	#tmp=zr*zr
+	mul.d	$f16,$f16,$f4	#tmp=zr*zr*zr
+	add.d	$f18,$f16,$f0	#sr =zr*zr*zr+cr
+	mul.d	$f16,$f6,$f6	#tmp=zi*zi
+	mul.d	$f16,$f16,$f6	#tmp=zi*zi*zi
+	mul.d	$f16,$f18,$f16	#tmp=zi*zi*zi*3
+	add.d	$f18,$f18,$f16	#sr=todo el resto
 
 
-	li	v0,SYS_write
-	addiu	a0,zero,1
-	addiu	a1,zero,20
-	addiu	a2,zero,4
-	syscall
 
-	#salvo a0
-	sw	a0,32(sp)
-	lw	t1,32(sp)
-	# Calculamos la longitud del string.
+loop2:
 	#
+
+
+	
+
+
+
+
+
+
+
 	la	a0, msg
 	jal	mystrlen
 	sw      v0, 8(sp)
@@ -51,10 +86,6 @@ mips32_plot:
 	# al cruzar la interfaz de llamadas al sistema, algo que
         # no ocurre en el caso de llamadas a procedimientos.
 	#
-	#li	v0, 1 # ver dentro de <sys/syscall.h>.
-	#li	a0, 1         # a0: standard output file descriptor.
-	#li	a1, 2       # a1: data pointer.
-	#li	a2, 1     # a2: longitud, según mystrlen().
 
 	#con esto imprimo texto
 	#li v0,SYS_write
@@ -64,7 +95,7 @@ mips32_plot:
 	#syscall
 
 	#PRINTF FUNCIONANDO, imprime t0!! 
-	addiu	t0,10
+miprintf:
 	la	a0,print
 	move	a1,t0
 	lw	t9,%call16(printf)(gp)
@@ -112,6 +143,16 @@ mystrlen_return:
 	#
 	j	ra
 	.end	mystrlen
+
+	lw	ra,  28(sp)
+	lw	$fp, 24(sp)
+	move	sp, $fp
+	lw	a0,	32(sp)
+	lw	a1,	36(sp)
+	lw	a2,	40(sp)
+	lw	a3,	44(sp)
+	addu	sp,sp,32
+
 
 	.rdata
 msg:

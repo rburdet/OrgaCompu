@@ -30,10 +30,11 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stddef.h>
 
 static void plot(void);
-//extern void mips32_plot(param_t *);
-extern void mips32_plot(int t);
+//extern void mips32_plot(FILE *);
+extern void mips32_plot(param_t *);
 
 /*
  * Parámetros globales.
@@ -344,14 +345,20 @@ plot(void)
 	parms.UL_im = upper_left_im;
 	parms.LR_re = lower_right_re;
 	parms.LR_im = lower_right_im;
-        parms.d_re = (lower_right_re - upper_left_re) / x_res;
-        parms.d_im = (upper_left_im - lower_right_im) / y_res;
-        parms.x_res = x_res;
-        parms.y_res = y_res;
-        parms.shades = 255;
-        parms.fp = output;
 
-		int file = open("pru.txt",O_WRONLY);
-		
-	mips32_plot(file);
+	parms.d_re = (lower_right_re - upper_left_re) / x_res;
+	parms.d_im = (upper_left_im - lower_right_im) / y_res;
+
+	parms.x_res = x_res;
+	parms.y_res = y_res;
+
+	parms.shades = 255;
+
+	parms.fp = output;
+
+	printf("dir struct parms %d\n",&parms);
+	printf("dir struct FILE %d\n",parms.fp);
+	printf("valor q tengo q tener %u\n",parms.fp->_file);
+	//mips32_plot(output);
+	mips32_plot(&parms);
 }
