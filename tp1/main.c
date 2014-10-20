@@ -23,8 +23,17 @@
 #define optional_argument 2
 #endif
 
+
+
+
+//TODO: SACAR ESTOS INCLUDES
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 static void plot(void);
-extern void mips32_plot(param_t *);
+//extern void mips32_plot(param_t *);
+extern void mips32_plot(int t);
 
 /*
  * Parámetros globales.
@@ -342,5 +351,7 @@ plot(void)
         parms.shades = 255;
         parms.fp = output;
 
-	mips32_plot(&parms);
+		int file = open("pru.txt",O_WRONLY);
+		
+	mips32_plot(file);
 }
