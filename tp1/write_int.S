@@ -2,7 +2,7 @@
 // PARAMETROS
 // a0: entero a escribir
 // a1: file descriptor
-// Valor de retorno: numeros de bytes escritos
+// Valor de retorno: void
 */
 
 #include <mips/regdef.h>
