@@ -166,7 +166,12 @@ loop_x:
 	sw	t0,LTA_POS+24($fp)	# c -> 24
 
 loop_c:
+
+	###### ES UN ++c
     lw  t0,LTA_POS+24($fp)
+	addi	t0,1 
+	sw	t0,LTA_POS+24($fp)
+
 	lw	t1,FRAME_SIZE($fp)	#traigo parms 
 	lw	t1,shades(t1)	#t1 = parms->shades
 	bge	t0,t1,write_out	# if (c>parms->shades) {write_out}
@@ -213,10 +218,6 @@ loop_c:
 	s.s $f4, LTA_POS+20($fp)
 	s.s $f6, LTA_POS+16($fp)
 
-inc_c:
-	lw	t0,LTA_POS+24($fp)
-	addi	t0,1 
-	sw	t0,LTA_POS+24($fp)
 	j	loop_c
 
 
