@@ -1,5 +1,5 @@
 # Do not edit -- this file documents how this program was built for your machine.
-SYSTYPE	= NETBSD3
+SYSTYPE	= LINUX3
 SYSLIBS	= 
 CC	= gcc $(WARN) 
 OPT	= -O

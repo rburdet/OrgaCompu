@@ -356,9 +356,5 @@ plot(void)
 
 	parms.fp = output;
 
-	printf("dir struct parms %d\n",&parms);
-	printf("dir struct FILE %d\n",parms.fp);
-	printf("valor q tengo q tener %u\n",parms.fp->_file);
-	//mips32_plot(output);
 	mips32_plot(&parms);
 }
