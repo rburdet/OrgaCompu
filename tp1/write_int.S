@@ -7,10 +7,12 @@
 
 #include <mips/regdef.h>
 #include <sys/syscall.h>
+#define STDERR 2
 #define FRAME_SIZE 40
 #define GP_POS 24
 #define TEMP_CHAR 16
 #define ASCII_OFFSET 48
+#define ERROR_MSG_LENGTH 19
 .text
 .align 2
 .ent write_int
@@ -72,8 +74,13 @@ li a2, 1
 li v0, SYS_write
 syscall
 
-### TODO: Chequear error ###
-
+### Chequeo error ###
+bgez v0, end
+li a0, STDERR 
+la a1, error_msg
+li a2, ERROR_MSG_LENGTH 
+li v0, SYS_write
+syscall
 
 ### Rearmo el stack ###
 end:
@@ -84,3 +91,6 @@ addu sp, sp, FRAME_SIZE
 jr ra
 
 .end write_int
+
+.data
+error_msg: .asciiz "Error de escritura\n"
