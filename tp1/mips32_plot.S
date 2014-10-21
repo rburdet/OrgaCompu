@@ -168,9 +168,6 @@ loop_x:
 loop_c:
 
 	###### ES UN ++c
-    lw  t0,LTA_POS+24($fp)
-	addi	t0,1 
-	sw	t0,LTA_POS+24($fp)
 
 	lw	t1,FRAME_SIZE($fp)	#traigo parms 
 	lw	t1,shades(t1)	#t1 = parms->shades
@@ -186,17 +183,17 @@ loop_c:
 	bc1t write_out
 
 	l.s $f4, LTA_POS+20($fp) # f4 = zr
-	mul.s $f6, $f4, $f4
+	mul.s $f6, $f4, $f4	# f6 = zr^2
 	mul.s $f6, $f6, $f4 # f6 = zr ^ 3
-	l.s $f8, LTA_POS+16($fp)
-	mul.s $f8, $f8, $f8
-	mul.s $f8, $f4, $f8 # f8 = zi ^ 2 * zr
-	li.s $f10, 3.0
-	mul.s $f8, $f8, $f10
-	sub.s $f6, $f6, $f8
-	l.s $f8, LTA_POS+12($fp)
-	add.s $f6, $f6, $f8
-	s.s $f6, LTA_POS+28($fp)
+	l.s $f8, LTA_POS+16($fp)	#f8 = zi
+	mul.s $f8, $f8, $f8			#f8=zi = zi ^ 2
+	mul.s $f8, $f4, $f8			#f8 = zi ^ 2 * zr
+	li.s $f10, 3.0				#f10 = 3
+	mul.s $f8, $f8, $f10		#f8 = zi^2*zr*3
+	sub.s $f6, $f6, $f8			#f6 = zr^3 - zi^2*zr*3
+	l.s $f8, LTA_POS+12($fp)	#f8 = cr
+	add.s $f6, $f6, $f8			#f6 = zr^3 - zi^2*zr*3 + cr
+	s.s $f6, LTA_POS+28($fp)	#sr -> 28
 
 	l.s	$f4,LTA_POS+20($fp) # f4 = zr
 	l.s $f6,LTA_POS+LTA_POS+16($fp) #f6 = zi
@@ -213,11 +210,14 @@ loop_c:
 	add.s $f4, $f4,$f6
 	s.s $f4,LTA_POS+32($fp)
 
-	l.s $f4, LTA_POS+28($fp)
+	l.s $f4, LTA_POS+28($fp)	#f4 = sr
 	l.s $f6, LTA_POS+32($fp)
-	s.s $f4, LTA_POS+20($fp)
+	s.s $f4, LTA_POS+20($fp)	#sr -> 20
 	s.s $f6, LTA_POS+16($fp)
 
+    lw  t0,LTA_POS+24($fp)
+	addi	t0,1 
+	sw	t0,LTA_POS+24($fp)
 	j	loop_c
 
 
@@ -230,15 +230,20 @@ write_out:
 	move a1, t1
 	jal write_int
 
-	#Imprimir espacio 
+
+
+	#Imprimir fin de linea
 	lw	t0,FRAME_SIZE($fp)
 	lw	t1,FD(t0)
 	lh	t1,descriptor(t1)	#me muevo al campo _file mediante un short
+
+	#t1 = FD
 	li	v0,SYS_write
 	move	a0,t1
-	la a1,space
+	la a1,endln
 	li a2,1
 	syscall
+
 	j inc_x
 
 inc_x:
