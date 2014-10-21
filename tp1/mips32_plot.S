@@ -56,7 +56,7 @@ mips32_plot:
 	li	v0,SYS_write
 	move	a0,t1
 	la a1,msgP2
-	li a2,4
+	li a2,3
 	syscall
 	#TODO: revisar error
 
@@ -80,7 +80,7 @@ mips32_plot:
 	li	v0,SYS_write
 	move	a0,t1
 	la a1,endln
-	li a2,2
+	li a2,1
 	syscall
 
 
@@ -106,56 +106,78 @@ mips32_plot:
 	li a2,1
 	syscall
 
-	#inicializo loop_y
-	li	t0,0
-	sw	t0,LTA_POS($fp)		#guardo y
+
+	#imprimo shades
 	lw	t0,FRAME_SIZE($fp)
-	l.s	$f4,UL_im(t0)
-	s.s	$f4,LTA_POS+4($fp)	#ci
+	lw	t1,FD(t0)
+	#t1 = FD
+	lh	t1,descriptor(t1)	#me muevo al campo _file mediante un short
+	lw	t0,shades(t0)
+	move	a0,t0
+	move	a1,t1
+	jal	write_int
+
+	#Imprimir fin de linea
+	lw	t0,FRAME_SIZE($fp)
+	lw	t1,FD(t0)
+	lh	t1,descriptor(t1)	#me muevo al campo _file mediante un short
+	#t1 = FD
+	li	v0,SYS_write
+	move	a0,t1
+	la a1,endln
+	li a2,1
+	syscall
+
+	#inicializo loop_y
+	li	t0,0	
+	sw	t0,LTA_POS($fp)		#guardo y=0 -> 0
+	lw	t0,FRAME_SIZE($fp)	#traigo parms
+	l.s	$f4,UL_im(t0)		#f4=UL_im
+	s.s	$f4,LTA_POS+4($fp)	#ci=UL_im -> 4
 loop_y:
 
 	#cargo y_res
-	lw	t0,FRAME_SIZE($fp)
+	lw	t0,FRAME_SIZE($fp)	#traigo parms
 	lw	t0,y_res(t0)	#t0 = parms->y_res
 	lw	t1,LTA_POS($fp)	#t1 = y
-    bge t1, t0, end
+    bge t1, t0, end	# if (y > y_res) {end}
 
 	#inicializo loop_x
 	li	t0,0
-	sw	t0,LTA_POS+8($fp)	#guardo x
-	lw	t0,FRAME_SIZE($fp)
-	l.s	$f4,UL_re(t0)
-	s.s	$f4,LTA_POS+12($fp)	#cr
+	sw	t0,LTA_POS+8($fp)	#guardo x=0 -> 8
+	lw	t0,FRAME_SIZE($fp)	#traigo parms
+	l.s	$f4,UL_re(t0)		#f4 = UL_re
+	s.s	$f4,LTA_POS+12($fp)	#cr=UL_re -> 12
 
 loop_x:
 	#cargo x_res
-	lw	t0,FRAME_SIZE($fp)
-	lw	t0,x_res(t0)	#t0 = parms->x_res
+	lw	t0,FRAME_SIZE($fp)	#traigo parm
+	lw	t0,x_res(t0)		#t0 = parms->x_res
 	lw	t1,LTA_POS+8($fp)	#t1 = x
-	bge	t1,t0,inc_y
+	bge	t1,t0,inc_y			#if (x>x_rs){inc y}
 
-	l.s	$f4,LTA_POS+4($fp)
+	l.s	$f4,LTA_POS+4($fp)	#f4 = ci
 	l.s	$f6,LTA_POS+12($fp)
-	s.s	$f4,LTA_POS+16($fp)	# zi
-	s.s	$f6,LTA_POS+20($fp) # zr
+	s.s	$f4,LTA_POS+16($fp)	# zi=ci -> 16
+	s.s	$f6,LTA_POS+20($fp) # zr=cr -> 20
 
 	#inicializo loop_c
 	li	t0,0
-	sw	t0,LTA_POS+24($fp)	# c
+	sw	t0,LTA_POS+24($fp)	# c -> 24
 
 loop_c:
     lw  t0,LTA_POS+24($fp)
-	lw	t1,FRAME_SIZE($fp)
+	lw	t1,FRAME_SIZE($fp)	#traigo parms 
 	lw	t1,shades(t1)	#t1 = parms->shades
-	bge	t0,t1,inc_x	#c<parms->shades
-	
-	l.s $f4, LTA_POS+20($fp)
-	l.s $f6, LTA_POS+16($fp)
+	bge	t0,t1,write_out	# if (c>parms->shades) {write_out}
+
+	l.s $f4, LTA_POS+20($fp)	#f4 = zr 
+	l.s $f6, LTA_POS+16($fp)	#f6 = zi 
 	mul.s $f4, $f4, $f4
 	mul.s $f6, $f6, $f6
 	add.s $f4, $f4, $f6
 	li.s $f6, 4.0
-	c.le.s $f6, $f4
+	c.le.s $f6, $f4	# if 4<absz then write_out
 	bc1t write_out
 
 	l.s $f4, LTA_POS+20($fp) # f4 = zr
@@ -190,11 +212,10 @@ loop_c:
 	l.s $f6, LTA_POS+32($fp)
 	s.s $f4, LTA_POS+20($fp)
 	s.s $f6, LTA_POS+16($fp)
-	j	loop_c
 
 inc_c:
 	lw	t0,LTA_POS+24($fp)
-	addi	t0,1 #TODO:VER
+	addi	t0,1 
 	sw	t0,LTA_POS+24($fp)
 	j	loop_c
 
@@ -212,14 +233,12 @@ write_out:
 	lw	t0,FRAME_SIZE($fp)
 	lw	t1,FD(t0)
 	lh	t1,descriptor(t1)	#me muevo al campo _file mediante un short
-
-	#t1 = FD
 	li	v0,SYS_write
 	move	a0,t1
 	la a1,space
 	li a2,1
 	syscall
-	j inc_c
+	j inc_x
 
 inc_x:
 	lw	t0,LTA_POS+8($fp)	#x
