@@ -122,7 +122,9 @@ Los parámetros válidos que puede recibir el programa son los siguientes: \\
 \begin{ttfamily}
 \begin{tabular}{lll}
 
-\bf{-o,} & \bf{--output} &(Parámetro obligatorio. Especifica archivo de salida, - para stdout). \\
+	\bf{-o,} & \bf{--output} &(Parámetro obligatorio. Especifica archivo de salida,\\
+	\bf{ }   & \bf{ } & - para stdout). \\
+
 \bf{-r,} & \bf{--resolution} &(Resolución de la imagen de salida).\\
 \bf{-c,} & \bf{--center} &(Centro de la imagen).\\
 \bf{-w,} & \bf{--width} &(Ancho del rectángulo a dibujar).\\
@@ -149,6 +151,7 @@ Para parsear los parámetros se usó la librería de GNU getopt, en particular s
 		\caption{Stack frame generado} \label{Figura 1}
 	\end{figure}
 	Se ve en la figura que LTA mide 40 bytes. El tamaño no fue arbitrario si no que se tuvieron en cuenta las variables locales que se tendrían que almacenar.
+	Para imprimir numeros a archivos se uso un procedimiento tambien hecho en assembly llamado \texttt{write\_int.S}
 	Para debuggear se usaron llamadas de MIPS a C de la función printf en versiones para enteros y floats, las mismas se pueden ver al final del código adjunto como \texttt{miprintf} y \texttt{printff} respectivamente.
 	
 	\emph{Nota:} El programa en la versión actual contiene un bug que no permite la correcta impresión del brillo de los pixeles.  
@@ -170,6 +173,12 @@ Para parsear los parámetros se usó la librería de GNU getopt, en particular s
 \subsection{mips32\_plot.S}
 \lstset{ language = [x86masm]assembler }
 \lstinputlisting[label=maincode]{../mips32_plot.S}
+
+\newpage 
+\subsection{write\_int.S}
+\lstset{ language = [x86masm]assembler }
+\lstinputlisting[label=maincode]{../write_int.S}
+
 
 \newpage 
 
