@@ -75,7 +75,7 @@ li v0, SYS_write
 syscall
 
 ### Chequeo error ###
-bgez v0, end
+bgez a3, end
 li a0, STDERR 
 la a1, error_msg
 li a2, ERROR_MSG_LENGTH 
