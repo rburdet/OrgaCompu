@@ -12,10 +12,10 @@
 #define y_res 28
 #define shades 32
 #define FD 36
-
 #define descriptor 14
 
-
+#define ERROR_MSG_LENGTH 19
+#define STDERR 2
 
 #define FRAME_SIZE	72
 #define GP_POS		FRAME_SIZE-16
@@ -58,7 +58,7 @@ mips32_plot:
 	la a1,msgP2
 	li a2,3
 	syscall
-	#TODO: revisar error
+	bne a3, zero, write_error
 
 	#imprimo xres
 	lw	t0,FRAME_SIZE($fp)
@@ -82,6 +82,7 @@ mips32_plot:
 	la a1,endln
 	li a2,1
 	syscall
+	bne a3, zero, write_error
 
 
 	#imprimo yres
@@ -105,6 +106,7 @@ mips32_plot:
 	la a1,endln
 	li a2,1
 	syscall
+	bne a3, zero, write_error
 
 
 	#imprimo shades
@@ -127,6 +129,7 @@ mips32_plot:
 	la a1,endln
 	li a2,1
 	syscall
+	bne a3, zero, write_error
 
 	#inicializo loop_y
 	li	t0,0	
@@ -240,7 +243,7 @@ write_out:
 	la a1,endln
 	li a2,1
 	syscall
-	#TODO: Controlar escritura
+	bne a3, zero, write_error
 
 inc_x:
 	lw	t0,LTA_POS+8($fp)	#x
@@ -264,6 +267,13 @@ inc_y:
 	s.s $f6,LTA_POS+4($fp)
 	j	loop_y
 
+write_error:
+	li a0, STDERR
+	la a1, error_msg
+	li a2, ERROR_MSG_LENGTH
+	li v0, SYS_write
+	syscall
+	j end
 
 	#PRINTF FUNCIONANDO, imprime t0!! 
 miprintf:
@@ -292,6 +302,8 @@ end:
 
 
 	.rdata
+error_msg:
+	.asciiz "Error de escritura\n"
 endln:
 	.asciiz	"\n"
 msgP2:
