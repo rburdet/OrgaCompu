@@ -12,13 +12,16 @@
 #define y_res 28
 #define shades 32
 #define FD 36
+
 #define descriptor 14
+
+
+
 #define FRAME_SIZE	72
 #define GP_POS		FRAME_SIZE-16
 #define FP_POS		FRAME_SIZE-12
 #define RA_POS		FRAME_SIZE-8
 #define LTA_POS		16
-#define ERROR_MSG_LENGTH 19
 
 
 #mips32_plot(param_t *);
@@ -55,14 +58,7 @@ mips32_plot:
 	la a1,msgP2
 	li a2,3
 	syscall
-
-#Chequeo el error
-	bgez a3, end
-	li a0, STDERR.
-	la a1, error_msg
-	li a2, ERROR_MSG_LENGTH.
-	li v0, SYS_write
-	syscall
+	#TODO: revisar error
 
 	#imprimo xres
 	lw	t0,FRAME_SIZE($fp)
@@ -85,14 +81,6 @@ mips32_plot:
 	move	a0,t1
 	la a1,endln
 	li a2,1
-	syscall
-
-# chequeo el error
-	bgez a3, end
-	li a0, STDERR.
-	la a1, error_msg
-	li a2, ERROR_MSG_LENGTH.
-	li v0, SYS_write
 	syscall
 
 
@@ -252,14 +240,7 @@ write_out:
 	la a1,endln
 	li a2,1
 	syscall
-
-# chequeo error
-	bgez a3, end
-	li a0, STDERR.
-	la a1, error_msg
-	li a2, ERROR_MSG_LENGTH.
-	li v0, SYS_write
-	syscall
+	#TODO: Controlar escritura
 
 inc_x:
 	lw	t0,LTA_POS+8($fp)	#x
@@ -317,7 +298,6 @@ msgP2:
 	.asciiz	"P2\n"
 space:
 	.asciiz	" "
-error_msg: .asciiz "Error de escritura\n"
 
 
 print:
