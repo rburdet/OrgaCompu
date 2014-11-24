@@ -39,10 +39,11 @@ generic_plot(param_t *parms)
 			for (c = 0; c < parms->shades; ++c) {
 				if ((absz = zr*zr + zi*zi) >= 4.0f)
 					break;
-				sr = zr * zr 
-				   - zi * zi
+				sr = zr * zr * zr 
+				   - 3 * zi * zi * zr
 				   + cr;
-				si = 2 * zr * zi
+				si = 3 * zr * zr * zi
+					 - zi * zi *zi
 				   + ci;
 				zr = sr;
 				zi = si;
