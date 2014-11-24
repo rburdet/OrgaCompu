@@ -19,8 +19,6 @@ static float FFX4[4] __attribute__ ((aligned (16)))
 	= {255.0f, 255.0f, 255.0f, 255.0f};
 static float FOUR[4] __attribute__ ((aligned (16))) 
 	= {4.0f, 4.0f, 4.0f, 4.0f};
-static float THREE[4] __attribute__ ((aligned (16))) 
-	= {3.0f, 3.0f, 3.0f, 3.0f};
 static float UNIT[4] __attribute__ ((aligned (16))) 
 	= {1.0f, 1.0f, 1.0f, 1.0f};
 
@@ -47,7 +45,7 @@ sse_plot(param_t *parms)
 	 * Barremos la región rectangular del plano complejo comprendida 
 	 * entre (parms->UL_re, parms->UL_im) y (parms->LR_re, parms->LR_im),
 	 * calculando el color de cada punto de acuerdo a la fórmula de la
-	 * recurrencia Z' = Z^3 + C
+	 * recurrencia Z' = Z^2 + C
 	 * 
 	 * Nomenclatura:
 	 * 
@@ -137,27 +135,16 @@ sse_plot(param_t *parms)
 			"increment:              \n\t"
 			"addps    %%xmm1, %%xmm0 \n\t" /* xmm0: ITER */
 
-			/* Calculate Z = Z^3 + C. */
-			"Z_eq_Z3_plus_C:         \n\t"
-			"mulps    %%xmm2, %%xmm4 \n\t" /* xmm4: ZR^2 * ZR */
-			"mulps    %%xmm2, %%xmm5 \n\t" /* xmm5: ZI^2 * ZR */
-			"mulps    %10,    %%xmm5 \n\t" /* xmm5: 3 * ZI^2 * ZR */
-			"subps    %%xmm5, %%xmm4 \n\t" /* xmm4: -= xmm5 */
+			/* Calculate Z = Z^2 + C. */
+			"Z_eq_Z2_plus_C:         \n\t"
+			"subps    %%xmm5, %%xmm4 \n\t" /* xmm4: ZR^2 - ZI^2 */
 
-			"movaps   %%xmm3, %%xmm5 \n\t" /* xmm5: ZI */
-			"mulps   %%xmm5, %%xmm5 \n\t" /* xmm5: ZI^2 */
-			"mulps   %%xmm3, %%xmm5 \n\t" /* xmm5: ZI^2 * ZI */
 			"movaps   %%xmm2, %%xmm6 \n\t" /* xmm6: ZR */
-			"mulps   %%xmm6, %%xmm6 \n\t" /* xmm6: ZR^2 */
-			"mulps   %%xmm3, %%xmm6 \n\t" /* xmm6: ZR^2 * ZI */
-			"mulps   %10,    %%xmm6 \n\t" /* xmm6: 3 * ZR^2 * ZI */
-			"subps    %%xmm5, %%xmm6 \n\t" /* xmm6: -= xmm5 */
+			"mulps    %%xmm3, %%xmm6 \n\t" /* xmm6: ZR*ZI */
+			"addps    %%xmm6, %%xmm6 \n\t" /* xmm6: 2*ZR*ZI */
 
 			"addps    %3, %%xmm4     \n\t" /* xmm4: += CR */
 			"addps    %4, %%xmm6     \n\t" /* xmm6: += CI */
-
-
-
 			"movaps   %%xmm4, %%xmm2 \n\t" /* xmm2: new ZR */
 			"movaps   %%xmm6, %%xmm3 \n\t" /* xmm3: new ZI */
 
@@ -209,8 +196,7 @@ sse_plot(param_t *parms)
 			  "m" (*FOUR),    /* %6 */
 			  "0" (u8),       /* %7 */
 			  "m" (*FFX4),    /* %8 */
-			  "m" (*UNIT),    /* %9 */
-				"m" (*THREE)		/* %10 */
+			  "m" (*UNIT)     /* %9 */
 			: "xmm0", "xmm1", "xmm2", "xmm3", 
 			  "xmm4", "xmm5", "xmm6", "xmm7",
 			  "mm0", "mm1", "eax", "ebx",
