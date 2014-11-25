@@ -162,6 +162,10 @@ do_usage(const char *name, int status)
 	                " Change the height of the spanned region.\n");
 	fprintf(stderr, "  -o, --output     "
 	                " Path to output file.\n");
+	fprintf(stderr, "  -n, --nthreads   "
+			            "  Set the number of threads for execution.\n");
+	fprintf(stderr, "  -m, --method     "
+			            "  Select the plot implementation. Eg: sse, generic.\n");
 	fprintf(stderr, "Examples:\n");
 	fprintf(stderr, "  %s -o output.pgm\n", name);
 	fprintf(stderr, "  %s -r 1600x1200 -o output.pgm\n", name);
